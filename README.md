@@ -12,5 +12,5 @@ I am currently completing the Full-Stack Software Development program with [Get 
 
 * [No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
 
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=mpartificer&layout=donut-vertical)](https://github.com/anuraghazra/github-readme-stats)
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=mpartificer&layout=donut-vertical&theme=dracula)](https://github.com/anuraghazra/github-readme-stats)
 
