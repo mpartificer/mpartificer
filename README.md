@@ -12,4 +12,4 @@ I am an aspiring full-stack software developer, with a B.A. (Hons.) in Sociology
 
 ### Graphics
 
-[![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=mpartificer&theme=dracula)](https://github.com/anuraghazra/github-readme-stats)
+[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=mpartificer&layout=donut-vertical)](https://github.com/anuraghazra/github-readme-stats)
