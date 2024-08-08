@@ -1,6 +1,6 @@
 # Hello! I'm Megan 👩🏻‍💻
 
-## I am a software developer living in St. John's, NL, Canada.
+## Software developer living in St. John's, NL, Canada.
 
 ### About Me
 
