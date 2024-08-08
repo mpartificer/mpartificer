@@ -8,10 +8,9 @@
 
 <p>I am currently completing the Full-Stack Software Development program with [Get Coding](https://www.getcoding.ca/).</p>
 
+<p>[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=mpartificer&layout=donut-vertical)](https://github.com/anuraghazra/github-readme-stats)</p>
+
 ### Projects
 
 * [No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
 
-### Graphics
-
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=mpartificer&layout=donut-vertical)](https://github.com/anuraghazra/github-readme-stats)
