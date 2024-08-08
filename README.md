@@ -8,7 +8,7 @@ I am an aspiring full-stack software developer, with a B.A. (Hons.) in Sociology
 
 ### Projects
 
-[No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
+* [No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
 
 ### Graphics
 
