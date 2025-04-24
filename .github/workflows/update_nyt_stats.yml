@@ -1,0 +1,38 @@
+name: Update NYT Puzzle Stats
+
+on:
+  schedule:
+    # Run daily at 9:00 AM UTC (adjust time as needed)
+    - cron: "0 9 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Update NYT Stats
+        env:
+          NYT_COOKIE: ${{ secrets.NYT_COOKIE }}
+        run: |
+          python nyt_stats.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update NYT puzzle stats" && git push)
