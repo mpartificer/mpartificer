@@ -1,0 +1,97 @@
+name: Update Profile README Stats
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-profile:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          
+      - name: Update NYT Stats
+        env:
+          NYT_COOKIE: ${{ secrets.NYT_COOKIE }}
+        run: |
+          python nyt_stats.py
+          
+      - name: Update profile README
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          python - <<EOF
+          import os
+          import re
+          import subprocess
+          
+          # Read the generated stats
+          with open('README.md', 'r') as f:
+              source_content = f.read()
+          
+          # Extract stats content
+          start_marker = "<!-- NYT_STATS_START -->"
+          end_marker = "<!-- NYT_STATS_END -->"
+          match = re.search(f"({re.escape(start_marker)}.*?{re.escape(end_marker)})", source_content, re.DOTALL)
+          
+          if not match:
+              print("Stats markers not found in the source README")
+              exit(1)
+              
+          stats_content = match.group(1)
+          
+          # Clone profile repository
+          token = os.environ.get('PERSONAL_ACCESS_TOKEN')
+          clone_url = f"https://x-access-token:{token}@github.com/mpartificer/mpartificer.git"
+          subprocess.run(["git", "clone", clone_url, "profile-repo"], check=True)
+          
+          # Check if profile README exists
+          profile_readme = "profile-repo/README.md"
+          if not os.path.exists(profile_readme):
+              print("Creating new profile README")
+              with open(profile_readme, 'w') as f:
+                  f.write(f"# My GitHub Profile\n\n{stats_content}")
+          else:
+              # Update existing README
+              with open(profile_readme, 'r') as f:
+                  profile_content = f.read()
+              
+              if start_marker in profile_content:
+                  print("Updating existing stats in profile README")
+                  pattern = re.escape(start_marker) + ".*?" + re.escape(end_marker)
+                  updated_content = re.sub(pattern, stats_content, profile_content, flags=re.DOTALL)
+              else:
+                  print("Adding stats to profile README")
+                  updated_content = profile_content + f"\n\n{stats_content}"
+              
+              with open(profile_readme, 'w') as f:
+                  f.write(updated_content)
+          
+          # Commit and push changes
+          os.chdir('profile-repo')
+          subprocess.run(["git", "config", "user.name", "github-actions[bot]"])
+          subprocess.run(["git", "config", "user.email", "github-actions[bot]@users.noreply.github.com"])
+          subprocess.run(["git", "add", "README.md"])
+          
+          # Only commit if there are changes
+          result = subprocess.run(["git", "diff", "--cached", "--quiet"], capture_output=True)
+          if result.returncode == 1:  # Changes detected
+              subprocess.run(["git", "commit", "-m", "Update NYT puzzle stats"])
+              subprocess.run(["git", "push"])
+              print("Changes pushed to profile repository")
+          else:
+              print("No changes to commit")
+          EOF
