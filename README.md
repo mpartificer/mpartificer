@@ -13,4 +13,9 @@ I am currently completing the Full-Stack Software Development program with [Get 
 * [No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
 
 <!-- NYT_STATS_START -->
+## 🧩 My NYT Puzzle Stats
+
+*Last updated: 2025-04-24 23:37:20*
+
+
 <!-- NYT_STATS_END -->
