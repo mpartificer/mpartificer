@@ -1,4 +1,4 @@
-# debug_nyt_stats.py - Drop-in replacement for nyt_stats.py with debugging
+# nyt_stats.py - Updated with current endpoints and better cookie handling
 import os
 import json
 import requests
@@ -7,35 +7,146 @@ import re
 
 def get_nyt_stats(cookie):
     """
-    Fetch NYT puzzle stats using user's cookie
+    Fetch NYT puzzle stats using user's cookie with updated endpoints
     """
     print(f"Cookie length: {len(cookie)}")
     print(f"Cookie starts with: {cookie[:20]}...")
     
+    # Parse the cookie string to extract important cookies
+    cookie_dict = {}
+    for item in cookie.split(';'):
+        if '=' in item:
+            key, value = item.strip().split('=', 1)
+            cookie_dict[key] = value
+    
+    # Check for essential cookies
+    essential_cookies = ['NYT-S', 'nyt-a', 'nyt-auth-method']
+    for essential in essential_cookies:
+        if any(essential in key for key in cookie_dict.keys()):
+            print(f"Found {essential} cookie")
+        else:
+            print(f"WARNING: {essential} cookie not found")
+            
+    # Prepare headers
     headers = {
         'Cookie': cookie,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://www.nytimes.com/crosswords',
+        'Origin': 'https://www.nytimes.com',
+        'Accept': 'application/json'
     }
     
-    # Try to get crossword stats
+    # === CROSSWORD STATS ===
     crossword_stats = {}
-    try:
-        crossword_url = 'https://www.nytimes.com/svc/crosswords/v6/puzzle/daily/stats.json'
-        print(f"Fetching crossword stats from: {crossword_url}")
-        crossword_response = requests.get(crossword_url, headers=headers)
-        print(f"Crossword response status: {crossword_response.status_code}")
-        print(f"Crossword response headers: {crossword_response.headers}")
-        if crossword_response.status_code == 200:
-            crossword_stats = crossword_response.json()
-            print(f"Crossword stats: {json.dumps(crossword_stats, indent=2)}")
-        else:
-            print(f"Crossword response text: {crossword_response.text[:200]}...")
-    except Exception as e:
-        print(f"Error fetching crossword stats: {e}")
     
-    # For debugging, let's create some dummy stats if we didn't get real ones
-    if not crossword_stats:
-        print("Using dummy crossword stats")
+    # Try updated endpoints
+    crossword_endpoints = [
+        'https://www.nytimes.com/svc/crosswords/v3/users/self/stats.json',
+        'https://www.nytimes.com/svc/games/v2/users/self/crossword/stats.json',
+        'https://www.nytimes.com/svc/games-assets/v2/users/self/puzzles/daily/stats.json'
+    ]
+    
+    for endpoint in crossword_endpoints:
+        try:
+            print(f"Trying crossword endpoint: {endpoint}")
+            response = requests.get(endpoint, headers=headers)
+            print(f"Response: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Success! Data keys: {list(data.keys())}")
+                
+                # Extract stats from response based on structure
+                if 'stats' in data:
+                    crossword_stats = data
+                    print("Found stats in direct response")
+                    break
+                elif 'dailyMiniStats' in data:
+                    crossword_stats = {'stats': data['dailyMiniStats']}
+                    print("Found dailyMiniStats")
+                    break
+                elif 'dailyStats' in data:
+                    crossword_stats = {'stats': data['dailyStats']}
+                    print("Found dailyStats")
+                    break
+                else:
+                    print(f"Response structure not recognized: {list(data.keys())}")
+            else:
+                print(f"Response text: {response.text[:100]}...")
+        except Exception as e:
+            print(f"Error with endpoint {endpoint}: {e}")
+    
+    # === WORDLE STATS ===
+    wordle_stats = {}
+    
+    # Try updated endpoints
+    wordle_endpoints = [
+        'https://www.nytimes.com/svc/wordle/v2/stats.json',
+        'https://www.nytimes.com/svc/games/v2/users/self/wordle/stats.json',
+        'https://www.nytimes.com/svc/games-assets/v2/users/self/puzzles/wordle/stats.json'
+    ]
+    
+    for endpoint in wordle_endpoints:
+        try:
+            print(f"Trying wordle endpoint: {endpoint}")
+            response = requests.get(endpoint, headers=headers)
+            print(f"Response: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Success! Data keys: {list(data.keys())}")
+                
+                # Extract stats based on structure
+                if 'data' in data:
+                    wordle_stats = data
+                    print("Found data in direct response")
+                    break
+                elif 'stats' in data:
+                    wordle_stats = {'data': data['stats']}
+                    print("Found stats")
+                    break
+                else:
+                    print(f"Response structure not recognized: {list(data.keys())}")
+            else:
+                print(f"Response text: {response.text[:100]}...")
+        except Exception as e:
+            print(f"Error with endpoint {endpoint}: {e}")
+    
+    # === SPELLING BEE STATS ===
+    spelling_bee_stats = {}
+    
+    # Try updated endpoints
+    sb_endpoints = [
+        'https://www.nytimes.com/svc/spelling-bee/v1/stats.json',
+        'https://www.nytimes.com/svc/games/v2/users/self/spelling-bee/stats.json',
+        'https://www.nytimes.com/svc/games-assets/v2/users/self/puzzles/spelling-bee/stats.json'
+    ]
+    
+    for endpoint in sb_endpoints:
+        try:
+            print(f"Trying spelling bee endpoint: {endpoint}")
+            response = requests.get(endpoint, headers=headers)
+            print(f"Response: {response.status_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Success! Data keys: {list(data.keys())}")
+                
+                # Extract stats based on structure
+                if 'stats' in data:
+                    spelling_bee_stats = data
+                    print("Found stats in direct response")
+                    break
+                else:
+                    print(f"Response structure not recognized: {list(data.keys())}")
+            else:
+                print(f"Response text: {response.text[:100]}...")
+        except Exception as e:
+            print(f"Error with endpoint {endpoint}: {e}")
+    
+    # If we didn't get any real stats, use dummy data
+    if not crossword_stats and not wordle_stats and not spelling_bee_stats:
+        print("No real stats found, using dummy data")
         crossword_stats = {
             "stats": {
                 "streakCount": 5,
@@ -44,25 +155,6 @@ def get_nyt_stats(cookie):
                 "averageSolveTime": 600
             }
         }
-    
-    # Try to get Wordle stats
-    wordle_stats = {}
-    try:
-        wordle_url = 'https://www.nytimes.com/svc/wordle/v2/stats.json'
-        print(f"Fetching Wordle stats from: {wordle_url}")
-        wordle_response = requests.get(wordle_url, headers=headers)
-        print(f"Wordle response status: {wordle_response.status_code}")
-        if wordle_response.status_code == 200:
-            wordle_stats = wordle_response.json()
-            print(f"Wordle stats keys: {list(wordle_stats.keys())}")
-        else:
-            print(f"Wordle response text: {wordle_response.text[:200]}...")
-    except Exception as e:
-        print(f"Error fetching Wordle stats: {e}")
-    
-    # For debugging, let's create some dummy stats if we didn't get real ones
-    if not wordle_stats:
-        print("Using dummy Wordle stats")
         wordle_stats = {
             "data": {
                 "currentStreak": 3,
@@ -72,10 +164,13 @@ def get_nyt_stats(cookie):
                 "guesses": {"1": 5, "2": 10, "3": 20, "4": 15, "5": 10, "6": 5}
             }
         }
+    else:
+        print("At least some real stats were found!")
     
     return {
         "crossword": crossword_stats,
         "wordle": wordle_stats,
+        "spelling_bee": spelling_bee_stats,
         "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
@@ -130,8 +225,25 @@ def format_stats_markdown(stats):
         
         markdown += "\n"
     
+    # Format Spelling Bee stats
+    if stats['spelling_bee'] and 'stats' in stats['spelling_bee']:
+        sb_stats = stats['spelling_bee']['stats']
+        markdown += "### Spelling Bee\n\n"
+        markdown += "| Statistic | Value |\n"
+        markdown += "|-----------|-------|\n"
+        
+        if 'currentStreak' in sb_stats:
+            markdown += f"| Current Streak | {sb_stats['currentStreak']} |\n"
+        if 'maxStreak' in sb_stats:
+            markdown += f"| Max Streak | {sb_stats['maxStreak']} |\n"
+        if 'gamesPlayed' in sb_stats:
+            markdown += f"| Games Played | {sb_stats['gamesPlayed']} |\n"
+        if 'genius' in sb_stats:
+            markdown += f"| Genius Achieved | {sb_stats['genius']} times |\n"
+        if 'pangrams' in sb_stats:
+            markdown += f"| Total Pangrams | {sb_stats['pangrams']} |\n"
+    
     print(f"Generated markdown length: {len(markdown)}")
-    print(f"Generated markdown:\n{markdown}")
     return markdown
 
 def update_readme(stats_markdown):
@@ -179,15 +291,13 @@ def update_readme(stats_markdown):
         end_idx = new_content.find(end_marker) + len(end_marker)
         stats_section = new_content[start_idx:end_idx]
         print(f"Stats section length in final README: {len(stats_section)}")
-        print(f"Stats section:\n{stats_section}")
 
 def main():
     # Get NYT cookie from environment variable
     nyt_cookie = os.environ.get('NYT_COOKIE')
     if not nyt_cookie:
         print("Error: NYT_COOKIE environment variable not set")
-        # For testing, use a dummy cookie
-        nyt_cookie = "dummy_cookie_for_testing"
+        return
     
     # Fetch stats
     stats = get_nyt_stats(nyt_cookie)
