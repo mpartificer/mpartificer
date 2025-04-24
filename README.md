@@ -12,4 +12,5 @@ I am currently completing the Full-Stack Software Development program with [Get 
 
 * [No Hands Baking!](https://mpartificer.github.io/NoHandsBaking/)
 
-
+<!-- NYT_STATS_START -->
+<!-- NYT_STATS_END -->
