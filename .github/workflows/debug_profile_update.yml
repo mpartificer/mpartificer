@@ -1,0 +1,129 @@
+name: Debug Profile README Update
+
+on:
+  workflow_dispatch:  # Manual trigger only for debugging
+
+jobs:
+  update-profile:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          
+      - name: Update NYT Stats
+        env:
+          NYT_COOKIE: ${{ secrets.NYT_COOKIE }}
+        run: |
+          python nyt_stats.py
+          
+      - name: Check README content
+        run: |
+          echo "==== README CONTENT START ===="
+          cat README.md
+          echo "==== README CONTENT END ===="
+          
+      - name: Run debug script
+        env:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          cat > debug_profile_update.py << 'EOF'
+          # debug_profile_update.py
+          import os
+          import re
+          import subprocess
+          
+          def debug_update():
+              """Debug the profile README update process"""
+              # Print current directory and files
+              print(f"Current directory: {os.getcwd()}")
+              print(f"Files in current directory: {os.listdir('.')}")
+              
+              # Check source README
+              if os.path.exists('README.md'):
+                  with open('README.md', 'r') as f:
+                      source_content = f.read()
+                  print(f"Source README length: {len(source_content)}")
+                  print(f"First 100 chars: {source_content[:100]}")
+                  
+                  # Check for markers
+                  start_marker = "<!-- NYT_STATS_START -->"
+                  end_marker = "<!-- NYT_STATS_END -->"
+                  
+                  if start_marker in source_content and end_marker in source_content:
+                      print("Found both markers in source README")
+                      start_index = source_content.find(start_marker)
+                      end_index = source_content.find(end_marker) + len(end_marker)
+                      stats_content = source_content[start_index:end_index]
+                      print(f"Stats content length: {len(stats_content)}")
+                      print(f"Stats content first 100 chars: {stats_content[:100]}")
+                      
+                      # Clone profile repository
+                      token = os.environ.get('PERSONAL_ACCESS_TOKEN')
+                      if not token:
+                          print("ERROR: Personal access token not found")
+                          return
+                          
+                      print("Cloning profile repository...")
+                      clone_url = f"https://x-access-token:{token}@github.com/mpartificer/mpartificer.git"
+                      subprocess.run(["git", "clone", clone_url, "profile-repo"], check=True)
+                      
+                      if os.path.exists("profile-repo/README.md"):
+                          print("Profile README exists")
+                          with open("profile-repo/README.md", 'r') as f:
+                              profile_content = f.read()
+                          
+                          print(f"Profile README length: {len(profile_content)}")
+                          
+                          # Update with simple string operations instead of regex
+                          if start_marker in profile_content and end_marker in profile_content:
+                              print("Markers found in profile README")
+                              prof_start = profile_content.find(start_marker)
+                              prof_end = profile_content.find(end_marker) + len(end_marker)
+                              
+                              # Replace section
+                              new_content = profile_content[:prof_start] + stats_content + profile_content[prof_end:]
+                              
+                              with open("profile-repo/README.md", 'w') as f:
+                                  f.write(new_content)
+                              print("Profile README updated with string operations")
+                          else:
+                              print("Markers NOT found in profile README")
+                              # Append to the end
+                              with open("profile-repo/README.md", 'a') as f:
+                                  f.write(f"\n\n{stats_content}\n")
+                              print("Stats appended to profile README")
+                          
+                          # Commit and push changes
+                          print("Committing changes...")
+                          os.chdir('profile-repo')
+                          subprocess.run(["git", "config", "user.name", "github-actions[bot]"])
+                          subprocess.run(["git", "config", "user.email", "github-actions[bot]@users.noreply.github.com"])
+                          subprocess.run(["git", "add", "README.md"])
+                          
+                          # Always commit for debugging purposes
+                          subprocess.run(["git", "commit", "-m", "Update NYT puzzle stats (debug)"])
+                          subprocess.run(["git", "push"])
+                          print("Changes pushed to profile repository")
+                      else:
+                          print("Profile README doesn't exist")
+                  else:
+                      print(f"Markers not found in source README. Start marker present: {start_marker in source_content}, End marker present: {end_marker in source_content}")
+              else:
+                  print("Source README.md not found")
+          
+          if __name__ == "__main__":
+              debug_update()
+          EOF
+          
+          python debug_profile_update.py
