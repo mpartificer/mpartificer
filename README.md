@@ -15,26 +15,18 @@ I am currently completing the Full-Stack Software Development program with [Get 
 <!-- NYT_STATS_START -->
 ## 🧩 My NYT Puzzle Stats
 
-*Last updated: 2025-05-24 09:19:36*
+*Last updated: 2025-06-21 00:36:03*
 
 ### Crossword
 
 | Statistic | Value |
 |-----------|-------|
-| Current Streak | 5 |
-| Max Streak | 10 |
-| Total Solved | 42 |
-| Average Time | 10m 0s |
-
-### Wordle
-
-| Statistic | Value |
-|-----------|-------|
-| Current Streak | 3 |
-| Max Streak | 12 |
-| Games Played | 65 |
-| Win Rate | 92% |
-| Guess Distribution | 1: 5, 2: 10, 3: 20, 4: 15, 5: 10, 6: 5 |
+| Current Streak | 0 |
+| Max Streak | 5 |
+| Total Solved | 235 |
+| Total Attempted | 872 |
+| Solve Rate | 26.9% |
+| Average Time | 46m 21s |
 
 
 <!-- NYT_STATS_END -->
