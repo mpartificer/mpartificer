@@ -15,16 +15,16 @@ I am currently completing the Full-Stack Software Development program with [Get 
 <!-- NYT_STATS_START -->
 ## 🧩 My New York Times Crossword Stats
 
-*Last updated: 2025-08-28 09:23:22*
+*Last updated: 2025-08-29 09:22:45*
 
 ### 🎯 Crossword
 
 | Statistic | Value |
 |-----------|-------|
-| 🔥 Current Streak | 4 |
+| 🔥 Current Streak | 5 |
 | 🏆 Max Streak | 6 |
-| ✅ Total Solved | 296 |
-| 🎲 Total Attempted | 959 |
+| ✅ Total Solved | 297 |
+| 🎲 Total Attempted | 961 |
 | 📊 Solve Rate | 30.9% |
 | ⏱️ Average Time | 39m 22s |
 
@@ -35,7 +35,7 @@ I am currently completing the Full-Stack Software Development program with [Get 
 | Monday | 4m 17s | 9m 26s | 152 | 🔥 10 |
 | Tuesday | 5m 44s | 14m 1s | 82 | 🔥 1 |
 | Wednesday | 8m 33s | 20m 7s | 38 | 🔥 1 |
-| Thursday | 19m 13s | 39m 15s | 5 | ❄️ 0 |
+| Thursday | 19m 13s | 36m 13s | 6 | 🔥 1 |
 | Friday | 21m 26s | 34m 54s | 11 | ❄️ 0 |
 | Saturday | 19m 43s | 39m 22s | 6 | ❄️ 0 |
 | Sunday | 38m 19s | 39m 20s | 2 | ❄️ 0 |
